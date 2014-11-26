@@ -3,39 +3,62 @@ function parsePreston(text){
     var lines = text.split('\n')
       , ret = []
       , curr = null
-      , state = 'notes' // possible states: text, notes, code
+      , state = 'text' // possible states: text, notes, code
+      , type= 'text'
     lines.forEach(function(line){
-        if (state === 'code' || line.trim()){
-            var indent = line.match(/^[ \t]*/)[0]
-            if (state === 'notes' && !indent){
-                if (curr)
-                    ret.push(curr)
-                if (line.match(/^<pre>.*<\/pre>[ \t]*$/)){
-                    curr = {text: '', notes: '', code: line}
-                    state = 'text'
-                }else if (line.match(/^<pre>/)){
-                    curr = {text: '', notes: '', code: line + '\n'}
-                    state = 'code'
-                }else{
+        console.log(line)
+        /*if (!curr){
+            curr = {text: '', notes: '', code: ''}
+        }*/
+        if (state === 'text'){
+            if (line.match(/^---$/))
+            {
+                console.log("Second slide found")
+                console.log(line)
+                console.log(curr)
+                ret.push(curr)
+                curr=null
+            }
+            if (line.match(/^<pre>.*<\/pre>*$/)){
+                curr.code += line
+                state = 'text'
+            }else if (line.match(/^<pre>/)){
+                curr.code += line + '\n'
+                state = 'code'
+            }
+            else if (line.match(/^<notes>.*<\/notes>*$/)){
+                curr.notes += line
+                state = 'text'
+            }else if (line.match(/^<notes>/)){
+                curr.notes += line + '\n'
+                state = 'notes'
+            }else if (!curr){
                     curr = {text: line + '\n', notes: '', code: ''}
                     state = 'text'
-                }
-            }else if (state === 'notes' && indent){
-                curr.notes += line.substring(indent.length) + '\n'
-            }else if (state === 'text' && !indent){
-                curr.text += line + '\n'
-            }else if (state === 'text' && indent){
-                curr.notes += line.substring(indent.length) + '\n'
-                state = 'notes'
-            }else if (state === 'code'){
+            }
+            else{
+                    curr.text += line + '\n'
+                    state = 'text'
+            }            
+        }
+        else if (state === 'code'){
                 curr.code += line + '\n'
                 if (line.match(/<\/pre>[ \t]*$/))
                     state = 'text'
-            }
         }
+        else if (state === 'notes' ){
+                curr.notes += line + '\n'
+                if (line.match(/<\/notes>*$/))
+                    state = 'text'
+        }
+
+        
     })
-    if (curr && (curr.text || curr.code))
+    if (curr && (curr.text || curr.code)){
+        console.log(curr)
         ret.push(curr)
+    }
+    console.log(ret)
     return ret
 }
 

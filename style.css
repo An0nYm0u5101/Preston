@@ -167,9 +167,11 @@ a{
 .slide body{
 	font-family: Bevan;
 }
-
-.slide #td{
+.slide h1,h2,h3,h4{
 	text-align: center;
+}
+.slide #td{
+	/*text-align: center;*/
 	vertical-align: middle;
 }
 .slide img{
